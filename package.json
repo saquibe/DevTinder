@@ -15,7 +15,8 @@
   "author": "saquib",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "reload": "^3.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
