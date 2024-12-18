@@ -3,17 +3,26 @@ import express from "express";
 
 const app = express();
 
-let port = 3000;
-
-//request handler
-app.use("/test", (req, res) => {
-  res.send("Hello response from the server!");
+//this will only handle GET call request
+app.get("/test", (req, res) => {
+  res.send({ FirstName: "Mohammad", LastName: "Saquib" });
 });
 
-app.use("/", (req, res) => {
+//post call sending data to database
+app.post("/user", (req, res) => {
+  res.send("Data saved to the database successfully!");
+});
+
+//delete call
+app.delete("/user1", (req, res) => {
+  res.send("User 1 is deleted successfully!");
+});
+
+//this will match all the http request
+app.use("/date", (req, res) => {
   res.send("Updated content: " + new Date());
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
+app.listen(3000, () => {
+  console.log(`Server is listening on port 3000...`);
 });
