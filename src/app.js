@@ -3,16 +3,16 @@ import express from "express";
 
 const app = express();
 
-app.use("/user", (req, res, next) => {
-  console.log("First response has send!");
-  // res.send("First response");
-  next();
+app.get("/userData", (req, res) => {
+  throw new Error("thorw new error");
+  res.send("User data response send");
 });
 
-app.use("/user", (req, res, next) => {
-  console.log("Second response has send!");
-  res.send("Second response");
-  next();
+//error handling
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Internal server error");
+  }
 });
 
 app.listen(3000, () => {
