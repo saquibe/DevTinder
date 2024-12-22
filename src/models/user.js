@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from 'validator';
 const {Schema} = mongoose;
 
 const userSchema = new Schema({
@@ -12,7 +13,12 @@ const userSchema = new Schema({
     emailId:{
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error('Invalid email address: '+ value    )
+            }
+        }
     },
     password:{
         type: String,
