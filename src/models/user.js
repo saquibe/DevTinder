@@ -5,10 +5,14 @@ const {Schema} = mongoose;
 const userSchema = new Schema({
     firstName:{
         type: String,
-        required: true
+        required: true,
+        maxLength: 50,
+        minLength: 3
     },
     lastName:{
-        type: String
+        type: String,
+        maxLength: 50,
+        minLength: 3
     },
     emailId:{
         type: String,
@@ -22,7 +26,12 @@ const userSchema = new Schema({
     },
     password:{
         type: String,
-        required: true
+        required: true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error('Enter strong password: '+ value    )
+            }
+        }
     },
     age:{
         type: Number

@@ -2,6 +2,8 @@
 import express from "express";
 import connectDb from "./config/database.js";
 import User from "./models/user.js";
+import { validateSignUpData } from "./utils/validation.js";
+import bcryptjs from 'bcryptjs';
 
 const app = express();
 
@@ -10,15 +12,22 @@ app.use(express.json());
 
 //signup api
 app.post('/signup', async  (req, res) => {
-  // console.log(req.body);
-  
-  // creating the new instance of the user model
-  const user = new User(req.body)
   try {
+  //validate data
+  validateSignUpData(req);
+  
+  //encrypt the password
+  const {firstName, lastName, emailId, password, gender} = req.body;
+  const hashPassword = await bcryptjs.hash(password, 10)
+    
+  // creating the new instance of the user model
+  const user = new User({
+    firstName, lastName, emailId, gender, password: hashPassword
+  })
     await user.save();
     res.send('User added successfully!');
   } catch (err) {
-    res.status(400).send('Error saving the user!'+ err.message);
+    res.status(400).send('Error: '+ err.message);
   }
 })
 
