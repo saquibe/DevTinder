@@ -4,11 +4,17 @@ import connectDb from "./config/database.js";
 import User from "./models/user.js";
 import { validateSignUpData } from "./utils/validation.js";
 import bcryptjs from 'bcryptjs';
+import cookieParser from "cookie-parser";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
 //middleware
-app.use(express.json());
+app.use(express.json());  
+app.use(cookieParser());
 
 //signup api
 app.post('/signup', async  (req, res) => {
@@ -41,12 +47,38 @@ app.post('/login', async (req, res) => {
     }
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if(isPasswordValid){
+      //create jwt token
+      const token = await jwt.sign({_id: user._id},  process.env.JWT_SECRET);
+      //add the token to cookie and send the response back to the user
+      res.cookie("token", token);
       res.send('Login successfully!');
     }else{
       throw new Error('Invalid credientials!');
     }
   } catch (err) {
     res.status(400).send('Error: '+ err.message);
+  }
+})
+
+//profile api
+app.get('/profile', async (req, res) => {
+  try {
+    const userCookie = req.cookies;
+    const {token} = userCookie;
+    if(!token){
+      throw new Error('Invalid token!');
+    }
+    //validate token
+    const decodeMessage = await jwt.verify(token, process.env.JWT_SECRET);
+    const {_id} = decodeMessage;
+    //get back profile of user when loggedIn
+    const user = await User.findById(_id);
+    if(!user){
+      throw new Error('User does not exist!');
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(400).send('Error: ', err.message);
   }
 })
 
@@ -81,7 +113,7 @@ app.get('/feed', async (req, res) => {
     const users = await User.find({});
     res.send(users);
   } catch (err) {
-    res.status(400).send('Something went wrong!', err.message);
+    res.status(400).send('Error: ', err.message);
   }
 })
 
