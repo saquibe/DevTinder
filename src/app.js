@@ -31,6 +31,24 @@ app.post('/signup', async  (req, res) => {
   }
 })
 
+//login api
+app.post('/login', async (req, res) => {
+  try {
+    const {emailId, password} = req.body;
+    const user = await User.findOne({emailId: emailId});
+    if(!user){
+      throw new Error('Invalid credientials!');
+    }
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if(isPasswordValid){
+      res.send('Login successfully!');
+    }else{
+      throw new Error('Invalid credientials!');
+    }
+  } catch (err) {
+    res.status(400).send('Error: '+ err.message);
+  }
+})
 
 //find user specific user
 // Get user by last name
