@@ -9,12 +9,13 @@ const userSchema = new Schema({
         type: String,
         required: true,
         maxLength: 50,
-        minLength: 3
+        minLength: 3,
+        index: true
     },
     lastName:{
         type: String,
         maxLength: 50,
-        minLength: 3
+        minLength: 2
     },
     emailId:{
         type: String,
@@ -40,7 +41,11 @@ const userSchema = new Schema({
     },
     gender:{
         type: String,
-        required: true
+        required: true,
+        enum:{
+            values: ['male', 'female', 'other'],
+            message: `{VALUE} is not a gender type`
+        }
     },
     avatar:{
         type: String, 
@@ -54,6 +59,8 @@ const userSchema = new Schema({
         type: [String]  
     }
 }, {timestamps: true})
+
+userSchema.index({firstName: 1, lastName: 1});
 
 userSchema.methods.getJWT = async function(){
     const user = this;

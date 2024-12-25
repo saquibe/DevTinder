@@ -24,8 +24,13 @@ profileRouter.post('/profile/edit', userAuth, async (req, res) => {
     loggedInUser[field] = req.body[field];
   })
   
-  res.send(`${loggedInUser.firstName} your profile updated successfully!`)
   await loggedInUser.save();
+
+   res.status(200).json({
+     success: true,
+     message: `${loggedInUser.firstName}, your profile has been updated successfully!`,
+     data: loggedInUser,
+   });
 }catch (err) {
  res.status(400).send('Error: '+ err.message);
 }})
