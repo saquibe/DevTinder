@@ -12,17 +12,25 @@ authRouter.post('/signup', async (req, res) => {
   validateSignUpData(req);
   
   //encrypt the password
-  const {firstName, lastName, emailId, password, gender} = req.body;
+  const {firstName, lastName, emailId, password, gender, age, skills, description, avatar} = req.body;
   const hashPassword = await bcryptjs.hash(password, 10)
     
   // creating the new instance of the user model
   const user = new User({
-    firstName, lastName, emailId, gender, password: hashPassword
-  })
+    firstName,
+    lastName,
+    emailId,
+    gender,
+    age,
+    skills,
+    description,
+    avatar,
+    password: hashPassword,
+  });
     await user.save();
-    res.send('User added successfully!');
+    res.status(201).json({message: 'User created successfully!', data: user});
   } catch (err) {
-    res.status(400).send('Error: '+ err.message);
+    res.status(400).json({message: 'Error: '+ err.message});
   }
 });
 
@@ -37,12 +45,12 @@ authRouter.post('/login', async (req, res) => {
     if(isPasswordValid){
       const token = await user.getJWT();
       res.cookie("token", token, {expires: new Date(Date.now() + 8 * 3600000)});
-      res.send('Login successfully!');
+      res.status(200).json({message: 'Login successfully!', data: user});
     }else{
       throw new Error('Invalid credientials!');
     }
   } catch (err) {
-    res.status(400).send('Error: '+ err.message);
+    res.status(400).json({message: 'Error: '+ err.message});
   }
 })
 
@@ -51,7 +59,7 @@ authRouter.post('/logout', (req, res) => {
   // res.send('Logout successfully!');
   //OR
   res.cookie('token', 'null', {expires: new Date(Date.now())});
-  res.send('Logout successfully!');
+  res.status(200).json({message: 'Logout successfully!'});
 })
 
 export default authRouter;

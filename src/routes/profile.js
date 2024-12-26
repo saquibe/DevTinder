@@ -7,9 +7,9 @@ const profileRouter = express.Router();
 profileRouter.get('/profile/view', userAuth, async (req, res) => {
   try {
     const user = req.user;
-    res.send(user);
+    res.status(200).json({message: 'Profile fetched successfully!', data: user});
   } catch (err) {
-    res.status(400).send('Error: ' + err.message);
+    res.status(400).json({message: 'Error: '+ err.message});
   }
 })
 
@@ -32,7 +32,7 @@ profileRouter.post('/profile/edit', userAuth, async (req, res) => {
      data: loggedInUser,
    });
 }catch (err) {
- res.status(400).send('Error: '+ err.message);
+ res.status(400).json({message: 'Error: '+ err.message});
 }})
 
 export default profileRouter;

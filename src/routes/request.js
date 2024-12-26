@@ -26,7 +26,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
     });
 
     if (existingConnectionRequest) {
-      return res.status(400).json({message: "Request already sent!"});
+      return res.status(400).json({message: "Connection request already exists!"});
     }
 
     const toUser = await User.findById(toUserId);
@@ -42,12 +42,12 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
 
     const data = await connectionRequest.save();
 
-    res.json({
+    res.status(200).json({
       message: "Request sent successfully!",
       data,
     });
   } catch (error) {
-    res.status(400).send('Error: '+ error.message);
+    res.status(400).json({message: "Error: " + error.message});
   }
 });
 
@@ -76,7 +76,7 @@ requestRouter.post('/request/review/:status/:requestId', userAuth, async (req, r
 
     await connectionRequest.save();
 
-    res.json({
+    res.status(200).json({
       message: "Request reviewed successfully! " + status,
       data: connectionRequest,
     });
