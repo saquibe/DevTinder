@@ -1,6 +1,7 @@
 import express from 'express';
 import { userAuth } from '../middlewares/auth.js';
 import ConnectionRequestModel from '../models/connectionRequest.js';
+import User from '../models/user.js';
 
 const userRouter = express.Router();
 
@@ -29,6 +30,28 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
     }});
 
     res.json({message: 'Connections fetched successfully!', data});
+  } catch (err) {
+    res.statusCode(400).send('Error: '+ err.message);
+  }
+})
+
+//feed
+userRouter.get('/user/feed', userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    //get all the connection requests (sent+received) for the logged in user
+    const connectionRequests = await ConnectionRequestModel.find({ $or: [{ fromUserId: loggedInUser._id}, { toUserId: loggedInUser._id}]}).select('fromUserId toUserId status').populate('fromUserId', ['firstName', 'lastName']).populate('toUserId', ['firstName', 'lastName']);
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((request) => {
+      hideUsersFromFeed.add(request.fromUserId._id.toString());
+      hideUsersFromFeed.add(request.toUserId._id.toString());
+    })
+  
+    const users = await User.find({$and: [{_id: {$nin: Array.from(hideUsersFromFeed)}}, {_id: {$ne: loggedInUser._id}}]}).select('firstName lastName age description avatar skills gender');
+    
+    res.json({message: 'Feed fetched successfully!', data: users});
+
   } catch (err) {
     res.statusCode(400).send('Error: '+ err.message);
   }
